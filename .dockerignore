@@ -1,0 +1,13 @@
+# Keeps the Docker build context (the repository root) small and the code layer
+# cacheable: only the sources are needed to build COIN-BIEVR in the image.
+.git
+**/build
+**/devel
+**/install
+**/log
+**/logs
+**/__pycache__
+**/*.bag
+**/*.db3
+**/*.tum
+config/params_temp.yaml

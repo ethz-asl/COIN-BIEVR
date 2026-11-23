@@ -1,0 +1,50 @@
+FROM osrf/ros:noetic-desktop-full
+
+# Build-time user matching the host user so bind-mounted files stay user-owned.
+# Override with --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g).
+ARG USERNAME=coin_bievr
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+
+# Create a host-matching user with passwordless sudo
+RUN apt-get update && apt-get install -y sudo && rm -rf /var/lib/apt/lists/* \
+ && groupadd -g ${GROUP_ID} ${USERNAME} \
+ && useradd -m -u ${USER_ID} -g ${GROUP_ID} -s /bin/bash ${USERNAME} \
+ && echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME}
+
+# Build context is the repository root (see run_docker_ros1.sh), so the image
+# always builds the checked-out code. Everything up to the COPY of the source is
+# independent of it and stays cached when only the code changes.
+#
+#   docker build -f docker/Dockerfile_ros1 -t coin_bievr_ros .
+#
+# Build args: USER_ID / GROUP_ID (see above), WITH_LIVOX=false to skip the Livox
+# SDKs and drivers (faster, e.g. for CI, but no Livox CustomMsg support).
+
+# Copy the scripts folder
+COPY docker/scripts/ /home/${USERNAME}/scripts/
+WORKDIR /home/${USERNAME}/
+RUN chmod a+x -R /home/${USERNAME}/scripts \
+ && chown -R ${USER_ID}:${GROUP_ID} /home/${USERNAME}
+
+# Env variables
+ENV CATKIN_WS=/home/${USERNAME}/catkin_ws
+ENV SCRIPTS_PATH=/home/${USERNAME}/scripts
+
+# Run the general and ROS dep installation (needs root for apt)
+RUN scripts/install_deps_ros1.sh
+
+# Install Ceres into /usr/local (needs root); it lands on cmake's default
+# search path, so no Ceres_DIR / CMAKE_PREFIX_PATH is required.
+RUN scripts/install_ceres.sh
+
+# Build the workspace as the non-root user in their home.
+USER ${USERNAME}
+RUN scripts/setup_workspace_ros1.sh
+# Declared here, so changing it does not invalidate the cached layers above.
+ARG WITH_LIVOX=true
+RUN if [ "$WITH_LIVOX" = "true" ]; then scripts/install_livox_ros1.sh; fi
+
+# The code itself: copied from the build context and built last.
+COPY --chown=${USER_ID}:${GROUP_ID} . /home/${USERNAME}/catkin_ws/src/COIN-BIEVR
+RUN scripts/build_ros1.sh

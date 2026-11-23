@@ -1,0 +1,27 @@
+topics:
+  pointcloud: "/livox/lidar"
+  imu: "/livox/imu"
+
+calibration: # T_IMU_LIDAR (LiDAR -> IMU)
+  translation: [0.04165, 0.02326, -0.0284]
+  rotation: [1, 0, 0,
+             0, 1, 0,
+             0, 0, 1]
+
+lidar:
+  min_range_m: 0.5 # Exclude points closer than this range [m]
+  max_range_m: 200 # Exclude points farther than this range [m]
+  min_intensity: 2 # Exclude points dimmer than this, < 0 disables
+
+image:
+  intensity_scale: 2 # Raw intensity -> ~0-255, 90th percentile near 230
+  projector_type: "spherical"
+  line_removal: False
+  width: 1200
+  height: 250
+  fov_up_deg: 40 
+  fov_down_deg: -40
+  phi_offset_deg: 0
+  blur: False
+  brightness_filter: True
+  window: [45,15]

@@ -1,0 +1,57 @@
+topics:
+  pointcloud: "/ouster/points"
+  imu: "/ouster/imu"
+
+calibration: # T_IMU_LIDAR (LiDAR -> IMU)
+  translation: [-0.00625, 0.011775, -0.007645]
+  rotation: [1, 0, 0,
+             0, 1, 0,
+             0, 0, 1]
+
+lidar:
+  min_range_m: 0.5 # Exclude points closer than this range [m]
+  max_range_m: 100 # Exclude points farther than this range [m]
+  min_intensity: 2 # Exclude points dimmer than this, < 0 disables
+
+# Photometric preprocessing (Ouster OS0-128). Only used when
+# optimization.intensity_residual is enabled.
+optimization:
+  intensity_max_range: 15 # Intensity falls off too fast beyond this to be comparable [m]
+
+image:
+  projector_type: "ouster" # Maps points by scan index, so it needs the full organized scan
+  width: 1024
+  height: 128
+  intensity_scale: 0.5 # Raw intensity -> ~0-255, 90th percentile near 230
+  u_shift: 0 # Column shift applied after destaggering
+  destagger: True
+  line_removal: True
+  brightness_filter: True
+  window: [41, 7] # [width, height] of the brightness filter
+  blur: False
+  # pixel_shift_by_row from the sensor metadata: undoes the per-row column stagger.
+  offset_lut: [ 31,  10, -10, -30,  30,  10, -10, -29,  29,  10,  -9, -28,  28,   9,  -9, -27,
+                27,   9,  -9, -27,  27,   9,  -9, -26,  26,   9,  -9, -26,  26,   8,  -8, -25,
+                25,   8,  -8, -25,  25,   8,  -8, -25,  24,   8,  -8, -24,  24,   8,  -8, -24,
+                24,   8,  -8, -24,  24,   8,  -8, -24,  24,   8,  -8, -24,  24,   8,  -8, -24,
+                24,   8,  -8, -24,  24,   8,  -8, -24,  24,   8,  -8, -24,  24,   8,  -8, -24,
+                24,   8,  -8, -24,  24,   8,  -8, -24,  25,   8,  -8, -25,  25,   8,  -8, -25,
+                25,   8,  -8, -25,  26,   9,  -9, -26,  26,   9,  -9, -27,  27,   9,  -9, -27,
+                27,   9,  -9, -28,  28,   9, -10, -29,  29,  10, -10, -30,  30,  10, -10, -31]
+
+  # FIR filter pair that removes the horizontal line artifacts some LiDARs, especially
+  # Ouster sensors, show in the intensity image. Tuned for Ouster LiDARs (from
+  # COIN-LIO's artifact_removal.ipynb, see https://arxiv.org/abs/2310.01235); only
+  # used if `line_removal` is enabled.
+  high_pass_fir: [-0.00122687, -0.00152587,  0.0009631,   0.00382838,  0.00071422, -0.00765637,
+                  -0.00681285,  0.01015542,  0.01944999, -0.00536835, -0.03792929, -0.01565801,
+                   0.05816374,  0.07138264, -0.07402277, -0.30572514,  0.5802669,  -0.30572514,
+                  -0.07402277,  0.07138264,  0.05816374, -0.01565801, -0.03792929, -0.00536835,
+                   0.01944999,  0.01015542, -0.00681285, -0.00765637,  0.00071422,  0.00382838,
+                   0.0009631,  -0.00152587, -0.00122687]
+  low_pass_fir: [-0.0013038,  -0.00117813, -0.00102349, -0.00051396,  0.000759,    0.00322145,
+                  0.00724004,  0.01304552,  0.02066957,  0.02990645,  0.04030759,  0.0512121,
+                  0.06181081,  0.07123596,  0.07866427,  0.08341891,  0.08505541,  0.08341891,
+                  0.07866427,  0.07123596,  0.06181081,  0.0512121,   0.04030759,  0.02990645,
+                  0.02066957,  0.01304552,  0.00724004,  0.00322145,  0.000759,   -0.00051396,
+                 -0.00102349, -0.00117813, -0.0013038]

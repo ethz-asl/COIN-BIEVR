@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>coin_bievr_ros</name>
+  <version>0.0.0</version>
+  <description>The coin_bievr_ros package</description>
+
+  <maintainer email="patripfr@ethz.ch">Patrick Pfreundschuh</maintainer>
+
+  <license>BSD-3-Clause</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>coin_bievr</depend>
+  <depend>coin_bievr_ros_common</depend>
+  <depend>yaml-cpp</depend>
+  <depend>nav_msgs</depend>
+  <depend>rosbag</depend>
+  <depend>roscpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>tf</depend>
+  <depend>tf_conversions</depend>
+  <depend>visualization_msgs</depend>
+
+  <!-- Optional: Livox CustomMsg branches are only built if these drivers are
+       available. livox_ros_driver = gen1, livox_ros_driver2 = gen2. -->
+  <build_depend>livox_ros_driver</build_depend>
+  <exec_depend>livox_ros_driver</exec_depend>
+  <build_depend>livox_ros_driver2</build_depend>
+  <exec_depend>livox_ros_driver2</exec_depend>
+  <!-- Optional: the intensity map visualization (debug.publish_intensity_map)
+       is only built if nvblox_msgs is available. Shown with nvblox_rviz_plugin. -->
+  <build_depend>nvblox_msgs</build_depend>
+  <exec_depend>nvblox_msgs</exec_depend>
+</package>

@@ -1,0 +1,50 @@
+map:
+  pixel_size_m: 0.05 # Pixel side length [m]
+  voxel_size_m: 0.5 # Voxel side length [m]
+  normal_tolerance_deg: 3 # Normal change threshold to trigger reprojection of voxel image [°]
+  smooth: True # Apply smoothing to the voxel image
+  weighted: True # Weighted pixel update
+  max_size: 1500000 # Maximum number of voxels to keep in the map
+  smooth_intensity: True # Apply smoothing to the voxel intensity image
+  frame: "odom"
+
+preprocess:
+  downsample_resolution_m: 0.1 # Downsample points to this resolution [m]. In case of informed sampling, this
+  # corresponds to the high resolution voxels
+  informed_sampling: True
+
+optimization:
+  huber_delta: 0.1 # Huber norm threshold
+  # Photometric residual. Requires an `image` block in the sensor config: the weight
+  # below assumes the projector's normalized 0-255 output, not raw sensor units.
+  intensity_residual: True
+  intensity_weight: 0.0015 # Scales the intensity difference into metres
+  huber_delta_intensity: 0.1 # Huber norm threshold for the photometric residual
+  # The residual is applied only to the voxels whose texture runs along the direction
+  # geometry cannot resolve, since elsewhere it adds noise rather than information.
+  n_intensity_voxels: 100 # Voxels kept per scan
+  intensity_min_incidence_angle_deg: 15 # Skip surfaces seen edge-on. 0 disables
+  intensity_max_range: 0 # Skip points beyond this range [m]. 0 disables
+
+imu:
+    window_s: 10 # Time window for the inertial optimization [s]
+    t_init: 0.2 # Time to initialize bias and gravity [s]
+    frame: "imu"
+
+debug:
+  publish_all_clouds: False # Publish all clouds (fine, coarse, deskewed)
+  publish_degeneracy: False # Degenerate directions as arrows (needs the intensity residual)
+  publish_images: False # Publish the projected intensity images. Needs an `image` block
+  # Intensity map around the robot as a mesh (nvblox_msgs/Mesh, shown with the
+  # nvblox RViz plugin). Needs the intensity residual and nvblox_msgs at build time.
+  publish_intensity_map: False
+  intensity_map_radius_m: 15 # Voxels within this distance of the robot [m]
+  intensity_map_rate_hz: 2 # Update rate of the mesh
+  timing: False
+  log: False
+  dashboard: True # Fancy live status print (position, biases, timing, ...)
+  dashboard_ascii_path: "" # ASCII art for the dashboard. Empty = coin_bievr_ascii.txt next to the config.
+  dashboard_ascii_frame_lines: 17 # Lines per animation frame in the ASCII art (one frame per dashboard print). 0 = static image.
+  trajectory_path: "" # Path to save trajectory. If empty, logs will not be saved.
+
+max_num_threads: 0 # 0 = automatic, >0 = number of threads to use for parallel processing

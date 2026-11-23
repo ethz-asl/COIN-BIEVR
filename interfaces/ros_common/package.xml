@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>coin_bievr_ros_common</name>
+  <version>0.0.0</version>
+  <description>
+    Header-only, ROS-agnostic glue shared by the coin_bievr ROS1 and ROS2
+    wrappers: the YAML config loader and the templated message conversions.
+  </description>
+
+  <maintainer email="patripfr@ethz.ch">Patrick Pfreundschuh</maintainer>
+
+  <license>BSD-3-Clause</license>
+
+  <buildtool_depend>cmake</buildtool_depend>
+
+  <depend>coin_bievr</depend>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>

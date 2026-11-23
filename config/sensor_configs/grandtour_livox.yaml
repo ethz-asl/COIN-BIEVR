@@ -1,0 +1,35 @@
+topics:
+  pointcloud: "/gt_box/livox/lidar"
+  imu: "/gt_box/livox/imu_si_compliant"
+
+calibration: # T_IMU_LIDAR (LiDAR -> IMU)
+  translation: [-0.011, -0.02329, 0.04412]
+  rotation: [1, 0, 0,
+             0, 1, 0,
+             0, 0, 1]
+
+lidar:
+  min_range_m: 1 # Exclude points closer than this range [m]
+  min_intensity: 2 # Exclude points dimmer than this, < 0 disables
+
+imu:
+  normalized: 0 # Accelerometer reports m/s^2, not g
+
+# Photometric preprocessing. Only used when optimization.intensity_residual is enabled.
+optimization:
+  # intensity_max_range: 8 # Intensity falls off too fast beyond this to be comparable [m]
+  intensity_min_incidence_angle_deg: 2 # Skip surfaces seen edge-on. 0 disables
+
+image:
+  intensity_scale: 2.5 # Raw intensity -> ~0-255, 90th percentile near 230
+  projector_type: "spherical"
+  line_removal: False
+  width: 740
+  height: 80
+  fov_up_deg: 50
+  fov_down_deg: -10
+  phi_offset_deg: 0
+  blur: False
+  brightness_filter: True
+  window: [31, 13]
+  masks: [[0, 0, 700, 20]] # [x, y, width, height] per mask
